@@ -8,7 +8,6 @@ CONFIG_DIR="/config"
 CONFIG_FILE="${CONFIG_DIR}/config"
 RIGHTS_FILE="${CONFIG_DIR}/rights"
 USERS_FILE="${CONFIG_DIR}/users"
-LOGGING_FILE="${CONFIG_DIR}/logging"
 
 LOG_LEVEL=$(bashio::config 'log_level')
 STORAGE_LOC=$(bashio::config 'storage_location')
@@ -31,41 +30,9 @@ fi
 mkdir -p "${STORAGE_DIR}"
 bashio::log.info "Using storage location: ${STORAGE_DIR}"
 
-# Determine log level upper case
-LOG_LEVEL_UPPER=$(echo "${LOG_LEVEL:-info}" | tr '[:lower:]' '[:upper:]')
-
-# Create default logging configuration if not present
-if [ ! -f "${LOGGING_FILE}" ]; then
-    cat << EOF > "${LOGGING_FILE}"
-[loggers]
-keys = root
-
-[handlers]
-keys = console
-
-[formatters]
-keys = simple
-
-[logger_root]
-level = ${LOG_LEVEL_UPPER}
-handlers = console
-
-[handler_console]
-class = StreamHandler
-level = DEBUG
-formatter = simple
-args = (sys.stdout,)
-
-[formatter_simple]
-format = %(asctime)s - [%(process)d] %(levelname)s: %(message)s
-datefmt = %Y-%m-%d %H:%M:%S
-EOF
-    bashio::log.info "Created default logging configuration at ${LOGGING_FILE}"
-else
-    # Update log level in existing logging file if not in custom config mode
-    if ! bashio::config.true 'custom_config'; then
-        sed -i "s/^level = .*/level = ${LOG_LEVEL_UPPER}/" "${LOGGING_FILE}" || true
-    fi
+# Clean up legacy logging config file if present
+if [ -f "${CONFIG_DIR}/logging" ]; then
+    rm -f "${CONFIG_DIR}/logging"
 fi
 
 # Create default rights configuration if not present
@@ -126,9 +93,19 @@ filesystem_locking = True
 type = internal
 
 [logging]
-config = ${LOGGING_FILE}
+level = ${LOG_LEVEL:-info}
 EOF
     bashio::log.info "Created default Radicale configuration at ${CONFIG_FILE}"
+else
+    # Update log level and purge deprecated config option in existing configuration file if not in custom config mode
+    if ! bashio::config.true 'custom_config'; then
+        sed -i '/^config = .*/d' "${CONFIG_FILE}" || true
+        if grep -q "^level =" "${CONFIG_FILE}"; then
+            sed -i "s/^level = .*/level = ${LOG_LEVEL:-info}/" "${CONFIG_FILE}" || true
+        elif grep -q "^\[logging\]" "${CONFIG_FILE}"; then
+            sed -i "/^\[logging\]/a level = ${LOG_LEVEL:-info}" "${CONFIG_FILE}" || true
+        fi
+    fi
 fi
 
 # Manage users from add-on options when custom_config is false

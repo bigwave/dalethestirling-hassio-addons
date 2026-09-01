@@ -25,6 +25,7 @@ class TestRadicaleConfigLogic(unittest.TestCase):
         self.assertIn("[storage]", script_content)
         self.assertIn("[web]", script_content)
         self.assertIn("[logging]", script_content)
+        self.assertNotIn("config = ${LOGGING_FILE}", script_content)
 
         # Parse a sample generated config through configparser
         sample_config = """
@@ -53,7 +54,7 @@ filesystem_locking = True
 type = internal
 
 [logging]
-config = /config/logging
+level = info
 """
         parser = configparser.ConfigParser()
         parser.read_string(sample_config)
@@ -63,6 +64,8 @@ config = /config/logging
         self.assertEqual(parser.get("auth", "htpasswd_encryption"), "bcrypt")
         self.assertEqual(parser.get("storage", "type"), "multifilesystem")
         self.assertEqual(parser.get("web", "type"), "internal")
+        self.assertEqual(parser.get("logging", "level"), "info")
+        self.assertFalse(parser.has_option("logging", "config"))
 
     def test_radicale_rights_matching_rules(self):
         """Verify the rights logic used in Radicale 3.x."""
@@ -127,6 +130,16 @@ config = /config/logging
         self.assertEqual(username, "alice")
         # Bcrypt hashes start with $2a$, $2b$, or $2y$
         self.assertTrue(re.match(r"^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$", pw_hash))
+
+    def test_legacy_logging_cleanup(self):
+        """Verify that legacy config = lines are stripped and logging level is valid for Radicale v3."""
+        legacy_config = """[logging]\nconfig = /config/logging\nlevel = DEBUG\n"""
+        # Remove deprecated config line
+        cleaned = re.sub(r"^config = .*\n?", "", legacy_config, flags=re.MULTILINE)
+        parser = configparser.ConfigParser()
+        parser.read_string(cleaned)
+        self.assertFalse(parser.has_option("logging", "config"))
+        self.assertEqual(parser.get("logging", "level"), "DEBUG")
 
 
 if __name__ == "__main__":
