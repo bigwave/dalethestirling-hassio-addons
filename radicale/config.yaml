@@ -1,0 +1,34 @@
+# https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
+name: Radicale
+version: "1.0.0"
+slug: radicale
+description: "Radicale is a lightweight CalDAV (calendars, todo-lists) and CardDAV (contacts) server"
+url: "https://github.com/dalethestirling/hassio-addons/tree/main/radicale"
+arch:
+  - aarch64
+  - amd64
+init: false
+map:
+  - share:rw
+  - addon_config:rw
+  - ssl:ro
+options:
+  log_level: info
+  storage_location: addon_config
+  custom_config: false
+  users:
+    - username: admin
+      password: ""
+schema:
+  log_level: list(debug|info|warning|error)
+  storage_location: list(addon_config|share|internal)
+  custom_config: bool
+  users:
+    - username: str
+      password: password
+ports:
+  5232/tcp: 5232
+ports_description:
+  5232/tcp: CalDAV and CardDAV service port
+webui: "http://[HOST]:[PORT:5232]/"
+image: "ghcr.io/dalethestirling/{arch}-addon-radicale"

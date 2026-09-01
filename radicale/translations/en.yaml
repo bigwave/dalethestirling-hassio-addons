@@ -1,0 +1,13 @@
+configuration:
+  log_level:
+    name: Log Level
+    description: Logging verbosity for the Radicale service (debug, info, warning, error).
+  storage_location:
+    name: Storage Location
+    description: "Where to store collections: addon_config (/config/collections), share (/share/radicale/collections), or internal (/data/collections)."
+  custom_config:
+    name: Custom Configuration Mode
+    description: If enabled, disables automatic configuration management from UI and uses /config/config directly.
+  users:
+    name: Users
+    description: List of users with usernames and passwords to populate in the htpasswd file.

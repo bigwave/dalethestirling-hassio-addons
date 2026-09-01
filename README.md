@@ -14,13 +14,31 @@ In the pop-up window, enter [https://github.com/dalethestirling/hassio-addons/tr
 
 ## Add-ons
 
-This repository contains the following add-ons. Current addons are only built for ARM (aarch64) as I do not have an amd64 environment at this time to validate the builds with.
+This repository contains the following add-ons:
+
+### [Radicale add-on](./radicale)
+
+_Lightweight CalDAV (calendars, to-do lists) and CardDAV (contacts) server with built-in web management interface and multi-user access control._
+
+![Supports aarch64 Architecture][aarch64-shield]
+![Supports amd64 Architecture][amd64-shield]
 
 ### [WeeWX add-on](./weewx)
 
 _Weewx implementation with Home Assistant and inteceptor extentions installed and enabled._
 
 ![Supports aarch64 Architecture][aarch64-shield]
-![Supports amd64 Architecture][amd64-shield]
+![Supports amd64 Architecture][amd64-shield-tbd]
+
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
-[amd64-shield]: https://img.shields.io/badge/amd64-TBD-lightgrey.svg
+[amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
+[amd64-shield-tbd]: https://img.shields.io/badge/amd64-TBD-lightgrey.svg
+
+## Author
+
+This project is the original work of **dalethestirling**.
+
+- **Author**: dalethestirling
+- **Email**: dale.stirling@gmail.com
+
+This project is open source and licensed under the terms described in [LICENCE.md](LICENCE.md). Contributions are welcome — please see the project documentation for guidelines.
