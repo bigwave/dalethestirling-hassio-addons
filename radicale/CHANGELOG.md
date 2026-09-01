@@ -1,5 +1,9 @@
 <!-- https://developers.home-assistant.io/docs/add-ons/presentation#keeping-a-changelog -->
 
+## 1.0.3
+
+- Add fallback to default `info` log level in service `run` script when `log_level` option is unset or empty
+
 ## 1.0.2
 
 - Ensure configuration file is cleanly rewritten on startup when `custom_config` is `false`

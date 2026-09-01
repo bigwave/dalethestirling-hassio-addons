@@ -10,6 +10,8 @@ RIGHTS_FILE="${CONFIG_DIR}/rights"
 USERS_FILE="${CONFIG_DIR}/users"
 
 LOG_LEVEL=$(bashio::config 'log_level')
+if [ -z "$LOG_LEVEL" ]; then LOG_LEVEL="info"; fi
+
 STORAGE_LOC=$(bashio::config 'storage_location')
 
 bashio::log.info "Starting Radicale add-on initialisation..."
