@@ -62,8 +62,8 @@ EOF
     bashio::log.info "Created default rights configuration at ${RIGHTS_FILE}"
 fi
 
-# Create default Radicale configuration if not present
-if [ ! -f "${CONFIG_FILE}" ]; then
+# Manage Radicale configuration file
+if ! bashio::config.true 'custom_config' || [ ! -f "${CONFIG_FILE}" ]; then
     cat << EOF > "${CONFIG_FILE}"
 # Radicale Configuration File
 # Reference: https://radicale.org/v3.html#configuration
@@ -95,15 +95,15 @@ type = internal
 [logging]
 level = ${LOG_LEVEL:-info}
 EOF
-    bashio::log.info "Created default Radicale configuration at ${CONFIG_FILE}"
+    bashio::log.info "Configured Radicale configuration at ${CONFIG_FILE}"
 else
-    # Update log level and purge deprecated config option in existing configuration file if not in custom config mode
-    if ! bashio::config.true 'custom_config'; then
-        sed -i '/^config = .*/d' "${CONFIG_FILE}" || true
-        if grep -q "^level =" "${CONFIG_FILE}"; then
-            sed -i "s/^level = .*/level = ${LOG_LEVEL:-info}/" "${CONFIG_FILE}" || true
-        elif grep -q "^\[logging\]" "${CONFIG_FILE}"; then
+    # Purge deprecated logging config option from custom configuration file if present
+    sed -i -E '/^[[:space:]]*config[[:space:]]*=/d' "${CONFIG_FILE}" || true
+    if ! grep -q "^[[:space:]]*level[[:space:]]*=" "${CONFIG_FILE}"; then
+        if grep -q "^\[logging\]" "${CONFIG_FILE}"; then
             sed -i "/^\[logging\]/a level = ${LOG_LEVEL:-info}" "${CONFIG_FILE}" || true
+        else
+            echo -e "\n[logging]\nlevel = ${LOG_LEVEL:-info}" >> "${CONFIG_FILE}"
         fi
     fi
 fi
@@ -134,5 +134,6 @@ if [ ! -f "${USERS_FILE}" ] || [ ! -s "${USERS_FILE}" ]; then
     bashio::log.warning "Please update credentials in the Add-on Configuration or directly in ${USERS_FILE}!"
 fi
 
+export RADICALE_CONFIG="${CONFIG_FILE}"
 bashio::log.info "Starting Radicale CalDAV/CardDAV service on port 5232..."
 exec radicale --config "${CONFIG_FILE}"

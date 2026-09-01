@@ -1,5 +1,16 @@
 <!-- https://developers.home-assistant.io/docs/add-ons/presentation#keeping-a-changelog -->
 
+## 1.0.2
+
+- Ensure configuration file is cleanly rewritten on startup when `custom_config` is `false`
+- Automatically purge deprecated logging options on existing installations
+
+## 1.0.1
+
+- Fix service restart loop caused by deprecated `config` option under `[logging]` in Radicale v3
+- Automatically purge deprecated logging configuration lines from existing installations on startup
+- Export `RADICALE_CONFIG` environment variable for service startup
+
 ## 1.0.0
 
 - Initial release of the Radicale CalDAV & CardDAV server add-on
