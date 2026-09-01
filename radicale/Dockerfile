@@ -12,12 +12,6 @@ RUN apk update && \
         tzdata \
         python3 && \
     ln -sf python3 /usr/bin/python && \
-    apk add --no-cache --virtual .build-dependencies \
-        gcc \
-        musl-dev \
-        libffi-dev \
-        python3-dev \
-        py3-pip && \
     python3 -m venv /opt/venv && \
     . /opt/venv/bin/activate && \
     pip install --no-cache-dir --upgrade pip wheel && \
@@ -26,7 +20,6 @@ RUN apk update && \
         passlib[bcrypt] \
         bcrypt \
         defusedxml && \
-    apk del --purge .build-dependencies && \
     rm -rf /var/cache/apk/* /tmp/* /root/.cache
 
 ENV PATH="/opt/venv/bin:$PATH"
